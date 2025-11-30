@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Camera, Mail, Phone, MapPin, Calendar } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import MainLayout from '../components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import Button from '../components/ui/Button';

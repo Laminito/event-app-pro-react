@@ -18,7 +18,7 @@ const EventListPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = React.useState<EventCategory | 'all'>(
     (searchParams.get('category') as EventCategory) || 'all'
   );
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 9;
 

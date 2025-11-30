@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Calendar, User } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar } from 'lucide-react';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
