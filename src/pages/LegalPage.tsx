@@ -15,7 +15,7 @@ const LegalPage: React.FC = () => {
             </CardHeader>
             <CardContent className="prose max-w-none">
               <p>
-                En accédant et en utilisant YOUWARE, vous acceptez d'être lié par les présentes
+                En accédant et en utilisant Event App Pro, vous acceptez d'être lié par les présentes
                 conditions générales d'utilisation...
               </p>
             </CardContent>
@@ -39,7 +39,7 @@ const LegalPage: React.FC = () => {
             </CardHeader>
             <CardContent className="prose max-w-none">
               <p>
-                Les billets achetés sur YOUWARE peuvent être remboursés jusqu'à 48h avant
+                Les billets achetés sur Event App Pro peuvent être remboursés jusqu'à 48h avant
                 l'événement, sous réserve de l'accord de l'organisateur...
               </p>
             </CardContent>

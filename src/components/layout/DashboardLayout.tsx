@@ -37,7 +37,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       <div className="p-6 border-b">
         <Link to="/" className="flex items-center space-x-2">
           <Calendar className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">YOUWARE</span>
+          <span className="text-xl font-bold">Event App Pro</span>
         </Link>
         <p className="text-xs text-muted-foreground mt-2">Espace Organisateur</p>
       </div>
@@ -92,7 +92,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         <div className="flex h-16 items-center justify-between px-4">
           <Link to="/" className="flex items-center space-x-2">
             <Calendar className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">YOUWARE</span>
+            <span className="text-xl font-bold">Event App Pro</span>
           </Link>
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
