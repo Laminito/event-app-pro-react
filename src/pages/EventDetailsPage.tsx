@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -16,24 +16,68 @@ import MainLayout from '../components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
-import { mockEvents } from '../data/mockData';
+import Skeleton from '../components/ui/Skeleton';
 import { formatPrice, formatDate } from '../utils/helpers';
 import { useCartStore } from '../store';
+import { eventService } from '../services';
+import { Event } from '../types';
 
 const EventDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const event = mockEvents.find((e) => e.id === id);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [standardQuantity, setStandardQuantity] = React.useState(1);
   const [vipQuantity, setVipQuantity] = React.useState(0);
   const [isLiked, setIsLiked] = React.useState(false);
   const addToCart = useCartStore((state) => state.addToCart);
 
-  if (!event) {
+  useEffect(() => {
+    const fetchEvent = async () => {
+      if (!id) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const eventData = await eventService.getEventById(id);
+        setEvent(eventData);
+      } catch (err: any) {
+        console.error('Error fetching event:', err);
+        setError(err.message || 'Erreur lors du chargement de l\'événement');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="container mx-auto px-4 py-8">
+          <Skeleton className="h-96 w-full mb-8" />
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <Skeleton className="h-64 w-full" />
+            </div>
+            <div>
+              <Skeleton className="h-96 w-full" />
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (error || !event) {
     return (
       <MainLayout>
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold mb-4">Événement non trouvé</h1>
+          <p className="text-muted-foreground mb-6">{error || 'Cet événement n\'existe pas ou a été supprimé.'}</p>
           <Button onClick={() => navigate('/events')}>
             Retour aux événements
           </Button>

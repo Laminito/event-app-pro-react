@@ -1,14 +1,22 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Calendar, User, ShoppingCart, Search } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Calendar, User, ShoppingCart, Search, LogOut, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
 import { useCartStore } from '../../store';
+import { useAuth } from '../../context/AuthContext';
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const cartItems = useCartStore((state) => state.items);
+  const { isAuthenticated, user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   const navLinks = [
     { to: '/', label: 'Accueil' },
@@ -67,14 +75,36 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   )}
                 </Button>
               </Link>
-              <Link to="/profile">
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link to="/organizer">
-                <Button>Espace Organisateur</Button>
-              </Link>
+              
+              {isAuthenticated ? (
+                <>
+                  <Link to="/profile">
+                    <Button variant="ghost" size="icon" title={user?.name}>
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  {(user?.role === 'organizer' || user?.role === 'admin') && (
+                    <Link to="/organizer">
+                      <Button>Espace Organisateur</Button>
+                    </Link>
+                  )}
+                  <Button variant="ghost" size="icon" onClick={handleLogout} title="Déconnexion">
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login">
+                    <Button variant="outline">
+                      <LogIn className="h-4 w-4 mr-2" />
+                      Connexion
+                    </Button>
+                  </Link>
+                  <Link to="/register">
+                    <Button>S'inscrire</Button>
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -114,15 +144,45 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       Panier ({totalItems})
                     </Button>
                   </Link>
-                  <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">
-                      <User className="h-4 w-4 mr-2" />
-                      Mon Profil
-                    </Button>
-                  </Link>
-                  <Link to="/organizer" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full">Espace Organisateur</Button>
-                  </Link>
+                  
+                  {isAuthenticated ? (
+                    <>
+                      <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full">
+                          <User className="h-4 w-4 mr-2" />
+                          Mon Profil
+                        </Button>
+                      </Link>
+                      {(user?.role === 'organizer' || user?.role === 'admin') && (
+                        <Link to="/organizer" onClick={() => setIsMenuOpen(false)}>
+                          <Button className="w-full">Espace Organisateur</Button>
+                        </Link>
+                      )}
+                      <Button 
+                        variant="outline" 
+                        className="w-full" 
+                        onClick={() => {
+                          handleLogout();
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Déconnexion
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full">
+                          <LogIn className="h-4 w-4 mr-2" />
+                          Connexion
+                        </Button>
+                      </Link>
+                      <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                        <Button className="w-full">S'inscrire</Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </nav>
             </motion.div>

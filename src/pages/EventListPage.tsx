@@ -8,7 +8,8 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Badge from '../components/ui/Badge';
 import Skeleton from '../components/ui/Skeleton';
-import { mockEvents } from '../data/mockData';
+import { eventService } from '../services';
+import { useApi } from '../hooks/useApi';
 import { formatPrice, formatShortDate } from '../utils/helpers';
 import { EventCategory } from '../types';
 
@@ -18,9 +19,30 @@ const EventListPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = React.useState<EventCategory | 'all'>(
     (searchParams.get('category') as EventCategory) || 'all'
   );
-  const [isLoading] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 9;
+
+  const { data, isLoading, execute } = useApi(eventService.getEvents);
+
+  React.useEffect(() => {
+    const filters: any = {
+      page: currentPage,
+      limit: itemsPerPage,
+    };
+
+    if (selectedCategory !== 'all') {
+      filters.category = selectedCategory;
+    }
+
+    if (searchQuery) {
+      filters.search = searchQuery;
+    }
+
+    execute(filters);
+  }, [currentPage, selectedCategory, searchQuery, execute]);
+
+  const filteredEvents = data?.events || [];
+  const pagination = data?.pagination || { pages: 1 };
 
   const categories: (EventCategory | 'all')[] = [
     'all',
@@ -32,21 +54,6 @@ const EventListPage: React.FC = () => {
     'Formation',
     'Networking',
   ];
-
-  // Filter events
-  const filteredEvents = mockEvents.filter((event) => {
-    const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  // Pagination
-  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
-  const paginatedEvents = filteredEvents.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   const handleCategoryChange = (category: EventCategory | 'all') => {
     setSelectedCategory(category);
@@ -115,10 +122,10 @@ const EventListPage: React.FC = () => {
               </Card>
             ))}
           </div>
-        ) : paginatedEvents.length > 0 ? (
+        ) : filteredEvents.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {paginatedEvents.map((event, index) => (
+              {filteredEvents.map((event, index) => (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -191,7 +198,7 @@ const EventListPage: React.FC = () => {
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {pagination.pages > 1 && (
               <div className="flex justify-center items-center gap-2">
                 <Button
                   variant="outline"
@@ -202,7 +209,7 @@ const EventListPage: React.FC = () => {
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <div className="flex gap-2">
-                  {[...Array(totalPages)].map((_, i) => (
+                  {[...Array(Math.min(5, pagination.pages))].map((_, i) => (
                     <Button
                       key={i}
                       variant={currentPage === i + 1 ? 'default' : 'outline'}
@@ -216,8 +223,8 @@ const EventListPage: React.FC = () => {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(pagination.pages, p + 1))}
+                  disabled={currentPage === pagination.pages}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>

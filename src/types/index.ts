@@ -62,6 +62,8 @@ export interface User {
   phone: string;
   avatar?: string;
   role: 'user' | 'organizer' | 'admin';
+  location?: string;
+  birthdate?: string;
 }
 
 // Payment Types

@@ -6,8 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { EventCategory } from '../types';
+import { useAuth } from '../context/AuthContext';
+import { eventService } from '../services/eventService';
 
 const CreateEventPage: React.FC = () => {
+    const { user } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = React.useState({
     title: '',
@@ -16,15 +19,58 @@ const CreateEventPage: React.FC = () => {
     time: '',
     location: '',
     category: 'Concert' as EventCategory,
-    price: '',
-    vipPrice: '',
     capacity: '',
+    image: null,
+    featured: false,
+    published: true,
   });
+  const [tickets, setTickets] = React.useState([
+    { type: 'Standard', price: '', quantity: '' },
+    { type: 'VIP', price: '', quantity: '' },
+  ]);
+  const [tags, setTags] = React.useState<string>('');
+  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Événement créé avec succès !');
-    navigate('/organizer/events');
+    setError(null);
+    setIsLoading(true);
+    let imageUrl = '';
+    try {
+      // Upload image si sélectionnée
+      if (formData.image) {
+        imageUrl = await eventService.uploadEventImage(formData.image);
+      }
+      // Préparer les tickets avec le champ 'available'
+      const ticketsPayload = tickets
+        .filter(t => t.price && t.quantity)
+        .map(t => ({
+          type: t.type,
+          price: Number(t.price),
+          quantity: Number(t.quantity),
+          available: Number(t.quantity)
+        }));
+      // Préparer les tags
+      const tagsPayload = tags.split(',').map(tag => tag.trim()).filter(Boolean);
+      // Préparer les données pour l'API
+      const payload = {
+        ...formData,
+        capacity: Number(formData.capacity),
+        image: imageUrl,
+        tickets: ticketsPayload,
+        tags: tagsPayload,
+        organizer: user?.id,
+      };
+      await eventService.createEvent(payload);
+      alert('Événement créé avec succès !');
+      navigate('/organizer/events');
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err?.message || 'Erreur lors de la création de l\'événement');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const categories: EventCategory[] = [
@@ -37,6 +83,14 @@ const CreateEventPage: React.FC = () => {
     'Networking',
     'Autre',
   ];
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -126,10 +180,10 @@ const CreateEventPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Pricing */}
+          {/* Tickets & Capacity */}
           <Card>
             <CardHeader>
-              <CardTitle>Tarification</CardTitle>
+              <CardTitle>Billets & Capacité</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-3 gap-4">
@@ -137,25 +191,73 @@ const CreateEventPage: React.FC = () => {
                   label="Prix Standard (XOF)"
                   type="number"
                   placeholder="15000"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  value={tickets[0].price}
+                  onChange={(e) => setTickets([ { ...tickets[0], price: e.target.value }, tickets[1] ])}
+                  required
+                />
+                <Input
+                  label="Quantité Standard"
+                  type="number"
+                  placeholder="100"
+                  value={tickets[0].quantity}
+                  onChange={(e) => setTickets([ { ...tickets[0], quantity: e.target.value }, tickets[1] ])}
                   required
                 />
                 <Input
                   label="Prix VIP (XOF)"
                   type="number"
                   placeholder="35000"
-                  value={formData.vipPrice}
-                  onChange={(e) => setFormData({ ...formData, vipPrice: e.target.value })}
+                  value={tickets[1].price}
+                  onChange={(e) => setTickets([ tickets[0], { ...tickets[1], price: e.target.value } ])}
+                />
+                <Input
+                  label="Quantité VIP"
+                  type="number"
+                  placeholder="20"
+                  value={tickets[1].quantity}
+                  onChange={(e) => setTickets([ tickets[0], { ...tickets[1], quantity: e.target.value } ])}
                 />
                 <Input
                   label="Capacité"
                   type="number"
-                  placeholder="5000"
+                  placeholder="120"
                   value={formData.capacity}
                   onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
                   required
                 />
+              </div>
+            </CardContent>
+          </Card>
+          {/* Tags, Featured, Published */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Options avancées</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Input
+                label="Tags (séparés par des virgules)"
+                type="text"
+                placeholder="tech, innovation, conférence"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+              />
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.featured}
+                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                  />
+                  Mis en avant
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.published}
+                    onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
+                  />
+                  Publié
+                </label>
               </div>
             </CardContent>
           </Card>
@@ -167,9 +269,19 @@ const CreateEventPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="mb-2"
+                  disabled={isLoading}
+                />
+                {imagePreview && (
+                  <img src={imagePreview} alt="Aperçu" className="mx-auto mb-2 max-h-40 rounded" />
+                )}
                 <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">
-                  Cliquez ou glissez une image ici
+                  Cliquez ou sélectionnez une image
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   PNG, JPG jusqu'à 10MB
@@ -178,12 +290,15 @@ const CreateEventPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Submit */}
+          {/* Submit & Error */}
+          {error && (
+            <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded mb-4">{error}</div>
+          )}
           <div className="flex gap-4">
-            <Button type="submit" size="lg" className="flex-1">
-              Créer l'événement
+            <Button type="submit" size="lg" className="flex-1" disabled={isLoading}>
+              {isLoading ? 'Création...' : 'Créer l\'événement'}
             </Button>
-            <Button type="button" variant="outline" size="lg" onClick={() => navigate(-1)}>
+            <Button type="button" variant="outline" size="lg" onClick={() => navigate(-1)} disabled={isLoading}>
               Annuler
             </Button>
           </div>

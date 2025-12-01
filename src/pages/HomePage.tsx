@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight,
   Calendar,
-  MapPin,
   TrendingUp,
   Star,
 } from 'lucide-react';
@@ -12,13 +11,25 @@ import MainLayout from '../components/layout/MainLayout';
 import { Card, CardContent } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
-import { mockEvents } from '../data/mockData';
+import Skeleton from '../components/ui/Skeleton';
+import { eventService } from '../services';
+import { useApiQuery } from '../hooks/useApi';
 import { formatPrice, formatShortDate } from '../utils/helpers';
 import { EventCategory } from '../types';
 
 const HomePage: React.FC = () => {
-  const featuredEvents = mockEvents.filter((e) => e.featured);
-  const upcomingEvents = mockEvents.slice(0, 6);
+  const { data: featuredData, isLoading: loadingFeatured } = useApiQuery(
+    () => eventService.getFeaturedEvents(),
+    []
+  );
+
+  const { data: upcomingData, isLoading: loadingUpcoming } = useApiQuery(
+    () => eventService.getEvents({ limit: 6, sort: 'date' }),
+    []
+  );
+
+  const featuredEvents = featuredData || [];
+  const upcomingEvents = upcomingData?.events || [];
 
   const categories: { name: EventCategory; icon: string; color: string }[] = [
     { name: 'Concert', icon: '🎵', color: 'bg-purple-500' },
@@ -123,52 +134,55 @@ const HomePage: React.FC = () => {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredEvents.map((event, index) => (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Link to={`/events/${event.id}`}>
-                  <Card className="overflow-hidden hover:shadow-xl transition-shadow group">
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={event.image}
-                        alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <Badge className="absolute top-4 right-4">
-                        <Star className="h-3 w-3 mr-1" />
-                        Populaire
-                      </Badge>
-                    </div>
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="secondary">{event.category}</Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {formatShortDate(event.date)}
-                        </span>
+            {loadingFeatured ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <Card key={`skeleton-featured-${i}`}>
+                  <Skeleton className="h-48 w-full" />
+                  <CardContent className="p-6 space-y-3">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              featuredEvents.map((event, index) => (
+                <motion.div
+                  key={event.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <Link to={`/events/${event.id}`}>
+                    <Card className="overflow-hidden hover:shadow-xl transition-shadow group">
+                      <div className="relative h-48 overflow-hidden">
+                        <img
+                          src={event.image}
+                          alt={event.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                        <Badge className="absolute top-4 right-4">
+                          <Star className="h-3 w-3 mr-1" />
+                          Populaire
+                        </Badge>
                       </div>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                        {event.title}
-                      </h3>
-                      <div className="flex items-center text-sm text-muted-foreground mb-3">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        {event.location}
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold text-primary">
-                          À partir de {formatPrice(event.price)}
-                        </span>
-                        <Button size="sm">Réserver</Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </motion.div>
-            ))}
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="secondary">{event.category}</Badge>
+                          <span className="text-sm text-muted-foreground">
+                            {formatShortDate(event.date)}
+                          </span>
+                        </div>
+                        <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                          {event.title}
+                        </h3>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </motion.div>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -177,42 +191,55 @@ const HomePage: React.FC = () => {
       <section className="py-16 container mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8">Prochainement</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {upcomingEvents.map((event, index) => (
-            <motion.div
-              key={event.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
-              viewport={{ once: true }}
-            >
-              <Link to={`/events/${event.id}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-all">
-                  <div className="relative h-40">
-                    <img
-                      src={event.image}
-                      alt={event.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <CardContent className="p-4">
-                    <Badge variant="secondary" className="mb-2">
-                      {event.category}
-                    </Badge>
-                    <h3 className="font-semibold mb-2 line-clamp-1">
-                      {event.title}
-                    </h3>
-                    <div className="flex items-center text-xs text-muted-foreground mb-2">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      {formatShortDate(event.date)} • {event.time}
+          {loadingUpcoming ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <Card key={`skeleton-upcoming-${i}`}>
+                <Skeleton className="h-40 w-full" />
+                <CardContent className="p-4 space-y-2">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-5 w-full" />
+                  <Skeleton className="h-3 w-2/3" />
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            upcomingEvents.map((event, index) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Link to={`/events/${event.id}`}>
+                  <Card className="overflow-hidden hover:shadow-lg transition-all">
+                    <div className="relative h-40">
+                      <img
+                        src={event.image}
+                        alt={event.title}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <p className="text-sm font-bold text-primary">
-                      {formatPrice(event.price)}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
-            </motion.div>
-          ))}
+                    <CardContent className="p-4">
+                      <Badge variant="secondary" className="mb-2">
+                        {event.category}
+                      </Badge>
+                      <h3 className="font-semibold mb-2 line-clamp-1">
+                        {event.title}
+                      </h3>
+                      <div className="flex items-center text-xs text-muted-foreground mb-2">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {formatShortDate(event.date)} • {event.time}
+                      </div>
+                      <p className="text-sm font-bold text-primary">
+                        {formatPrice(event.price)}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))
+          )}
         </div>
       </section>
 
