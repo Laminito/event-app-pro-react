@@ -20,7 +20,7 @@ const CreateEventPage: React.FC = () => {
     location: '',
     category: 'Concert' as EventCategory,
     capacity: '',
-    image: null,
+    image: null as File | null,
     featured: false,
     published: true,
   });
@@ -55,7 +55,7 @@ const CreateEventPage: React.FC = () => {
       // Préparer les tags
       const tagsPayload = tags.split(',').map(tag => tag.trim()).filter(Boolean);
       // Préparer les données pour l'API
-      const payload = {
+      const payload: any = {
         ...formData,
         capacity: Number(formData.capacity),
         image: imageUrl,
@@ -66,6 +66,8 @@ const CreateEventPage: React.FC = () => {
       };
       // Retirer le champ published car le backend utilise status
       delete payload.published;
+      delete payload.image;
+      payload.image = imageUrl;
       
       console.log('📤 Payload envoyé:', payload);
       await eventService.createEvent(payload);

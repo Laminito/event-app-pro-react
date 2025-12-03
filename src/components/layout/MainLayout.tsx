@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Calendar, User, ShoppingCart, Search, LogOut, LogIn } from 'lucide-react';
+import { Menu, X, User, ShoppingCart, Search, LogOut, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
 import { useCartStore } from '../../store';
