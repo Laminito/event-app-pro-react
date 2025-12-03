@@ -63,8 +63,8 @@ const RegisterPage: React.FC = () => {
       >
         {/* Logo */}
         <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
-          <Calendar className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold">Event App Pro</span>
+          <span className="text-4xl">🎟️</span>
+          <span className="text-2xl font-bold">Hello Ticket</span>
         </Link>
 
         <Card>

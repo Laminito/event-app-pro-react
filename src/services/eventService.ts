@@ -49,9 +49,15 @@ export const eventService = {
   // Liste des événements avec filtres
   async getEvents(filters: EventFilters = {}): Promise<EventListResponse> {
     const response = await api.get('/events', { params: filters });
+    console.log('🔍 API Response:', response.data);
+    console.log('🔍 Filters:', filters);
+    
     // Le backend retourne { data, pagination } au lieu de { events, pagination }
     const rawEvents = response.data.data || response.data.events || [];
+    console.log('🔍 Raw Events:', rawEvents);
+    
     const events = rawEvents.map(mapBackendEventToFrontend);
+    console.log('🔍 Mapped Events:', events);
     
     return {
       events,

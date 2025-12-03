@@ -38,11 +38,16 @@ const EventListPage: React.FC = () => {
       filters.search = searchQuery;
     }
 
+    console.log('📄 EventListPage - Fetching events with filters:', filters);
     execute(filters);
   }, [currentPage, selectedCategory, searchQuery, execute]);
 
   const filteredEvents = data?.events || [];
   const pagination = data?.pagination || { pages: 1 };
+  
+  console.log('📄 EventListPage - Data:', data);
+  console.log('📄 EventListPage - Filtered Events:', filteredEvents);
+  console.log('📄 EventListPage - Pagination:', pagination);
 
   const categories: (EventCategory | 'all')[] = [
     'all',

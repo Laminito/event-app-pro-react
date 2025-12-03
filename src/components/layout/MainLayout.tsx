@@ -37,8 +37,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
-              <Calendar className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">Event App Pro</span>
+              <span className="text-3xl">🎟️</span>
+              <span className="text-xl font-bold">Hello Ticket</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -199,8 +199,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <Calendar className="h-6 w-6 text-primary" />
-                <span className="text-lg font-bold">Event App Pro</span>
+                <span className="text-2xl">🎟️</span>
+                <span className="text-lg font-bold">Hello Ticket</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 La plateforme événementielle #1 au Sénégal
@@ -232,7 +232,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-            © 2025 Event App Pro. Tous droits réservés.
+            © 2025 Hello Ticket. Tous droits réservés.
           </div>
         </div>
       </footer>

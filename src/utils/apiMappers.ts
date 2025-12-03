@@ -30,7 +30,9 @@ export const mapBackendUserToFrontend = (backendUser: any): User => {
 
 // Mapper pour transformer les données de l'API backend vers le format frontend
 export const mapBackendEventToFrontend = (backendEvent: any): Event => {
-  return {
+  console.log('🔄 Mapping event:', backendEvent);
+  
+  const mappedEvent = {
     id: backendEvent._id || backendEvent.id,
     title: backendEvent.title,
     description: backendEvent.description,
@@ -43,10 +45,13 @@ export const mapBackendEventToFrontend = (backendEvent: any): Event => {
     image: backendEvent.image,
     organizer: backendEvent.organizer?.name || backendEvent.organizer || '',
     capacity: backendEvent.capacity,
-    sold: backendEvent.sold,
+    sold: backendEvent.sold || 0,
     status: mapBackendStatus(backendEvent.status),
     featured: backendEvent.featured || false,
   };
+  
+  console.log('✅ Mapped to:', mappedEvent);
+  return mappedEvent;
 };
 
 // Mapper le statut du backend vers le frontend

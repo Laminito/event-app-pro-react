@@ -31,11 +31,13 @@ export function useApi<T>(
 
       try {
         const result = await apiFunction(...args);
+        console.log('🎯 useApi - Setting data:', result);
         setData(result);
         onSuccess?.(result);
         return result;
       } catch (err) {
         const error = err as Error;
+        console.error('❌ useApi - Error:', error);
         setError(error);
         onError?.(error);
         return undefined;

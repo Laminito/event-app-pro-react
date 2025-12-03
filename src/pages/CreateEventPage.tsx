@@ -62,7 +62,12 @@ const CreateEventPage: React.FC = () => {
         tickets: ticketsPayload,
         tags: tagsPayload,
         organizer: user?.id,
+        status: formData.published ? 'published' : 'draft', // Utiliser status au lieu de published
       };
+      // Retirer le champ published car le backend utilise status
+      delete payload.published;
+      
+      console.log('📤 Payload envoyé:', payload);
       await eventService.createEvent(payload);
       alert('Événement créé avec succès !');
       navigate('/organizer/events');
