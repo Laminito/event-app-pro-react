@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
+import Logo from '../ui/Logo';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -36,7 +37,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     <>
       <div className="p-6 border-b">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="text-3xl">🎟️</span>
+          <Logo size="md" />
           <span className="text-xl font-bold">Hello Ticket</span>
         </Link>
         <p className="text-xs text-muted-foreground mt-2">Espace Organisateur</p>
@@ -91,7 +92,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       <header className="lg:hidden sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
         <div className="flex h-16 items-center justify-between px-4">
           <Link to="/" className="flex items-center space-x-2">
-            <span className="text-3xl">🎟️</span>
+            <Logo size="md" />
             <span className="text-xl font-bold">Hello Ticket</span>
           </Link>
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>

@@ -5,6 +5,7 @@ import { ArrowRight, AlertCircle } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import Logo from '../components/ui/Logo';
 import { useAuth } from '../context/AuthContext';
 
 const RegisterPage: React.FC = () => {
@@ -62,8 +63,8 @@ const RegisterPage: React.FC = () => {
         className="w-full max-w-md"
       >
         {/* Logo */}
-        <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
-          <span className="text-4xl">🎟️</span>
+        <Link to="/" className="flex items-center justify-center space-x-3 mb-8">
+          <Logo size="xl" />
           <span className="text-2xl font-bold">Hello Ticket</span>
         </Link>
 

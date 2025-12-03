@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, ShoppingCart, Search, LogOut, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
+import Logo from '../ui/Logo';
 import { useCartStore } from '../../store';
 import { useAuth } from '../../context/AuthContext';
 
@@ -37,7 +38,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
-              <span className="text-3xl">🎟️</span>
+              <Logo size="md" />
               <span className="text-xl font-bold">Hello Ticket</span>
             </Link>
 
@@ -199,7 +200,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <span className="text-2xl">🎟️</span>
+                <Logo size="lg" />
                 <span className="text-lg font-bold">Hello Ticket</span>
               </div>
               <p className="text-sm text-muted-foreground">
