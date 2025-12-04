@@ -20,8 +20,8 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
       xmlns="http://www.w3.org/2000/svg"
     >
       {/* Centre du logo */}
-      <circle cx="100" cy="100" r="20" fill="none" stroke="#a855f7" strokeWidth="4" />
-      <circle cx="100" cy="100" r="35" fill="none" stroke="#a855f7" strokeWidth="3" />
+      <circle cx="100" cy="100" r="20" fill="none" stroke="#8b5cf6" strokeWidth="4" />
+      <circle cx="100" cy="100" r="35" fill="none" stroke="#8b5cf6" strokeWidth="3" />
       
       {/* Rayons extérieurs */}
       {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle) => {
@@ -35,8 +35,8 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
         
         return (
           <g key={angle}>
-            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#a855f7" strokeWidth="3" />
-            <circle cx={cx} cy={cy} r="5" fill="#a855f7" />
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#8b5cf6" strokeWidth="3" />
+            <circle cx={cx} cy={cy} r="5" fill="#8b5cf6" />
           </g>
         );
       })}
